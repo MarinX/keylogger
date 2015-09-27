@@ -48,7 +48,7 @@ Capture global keyboard events on Linux
     }
 
 # Creating key sniffer
-* <link>
+* [sniffing global keyboard eventy in go](https://medium.com/@marin.basic02/sniffing-global-keyboard-events-in-go-e5497e618192/)
 
 
 # License
