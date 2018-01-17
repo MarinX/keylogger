@@ -22,7 +22,7 @@ func NewDevices() ([]*InputDevice, error) {
 	for i := 0; i < MAX_FILES; i++ {
 		buff, err := ioutil.ReadFile(fmt.Sprintf(INPUTS, i))
 		if err != nil {
-			break
+			continue
 		}
 		ret = append(ret, newInputDeviceReader(buff, i))
 	}
