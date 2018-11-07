@@ -8,8 +8,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"os/user"
 	"strings"
+	"syscall"
 )
 
 func NewDevices() ([]*InputDevice, error) {
@@ -31,11 +31,7 @@ func NewDevices() ([]*InputDevice, error) {
 }
 
 func checkRoot() error {
-	u, err := user.Current()
-	if err != nil {
-		return err
-	}
-	if u.Uid != "0" {
+	if syscall.Getuid() != 0 && syscall.Geteuid() != 0 {
 		return fmt.Errorf("Cannot read device files. Are you running as root?")
 	}
 	return nil
