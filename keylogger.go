@@ -1,101 +1,103 @@
-// keylogger
 package keylogger
 
 import (
-	"bufio"
 	"bytes"
 	"encoding/binary"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"strings"
 	"syscall"
+
+	"github.com/sirupsen/logrus"
 )
 
-func NewDevices() ([]*InputDevice, error) {
-	var ret []*InputDevice
+// KeyLogger wrapper around file descriptior
+type KeyLogger struct {
+	fd *os.File
+}
 
-	if err := checkRoot(); err != nil {
-		return ret, err
+// New creates a new keylogger for a device path
+func New(devPath string) (*KeyLogger, error) {
+	k := &KeyLogger{}
+	if !k.IsRoot() {
+		return nil, errors.New("Must be run as root")
 	}
+	fd, err := os.Open(devPath)
+	k.fd = fd
+	return k, err
+}
 
-	for i := 0; i < MAX_FILES; i++ {
-		buff, err := ioutil.ReadFile(fmt.Sprintf(INPUTS, i))
+// FindKeyboardDevice by going through each device registered on OS
+// Mostly it will contain keyword - keyboard
+// Returns the file path which contains events
+func FindKeyboardDevice() string {
+	path := "/sys/class/input/event%d/device/name"
+	resolved := "/dev/input/event%d"
+
+	for i := 0; i < 255; i++ {
+		buff, err := ioutil.ReadFile(fmt.Sprintf(path, i))
 		if err != nil {
-			continue
+			logrus.Error(err)
 		}
-		ret = append(ret, newInputDeviceReader(buff, i))
+		if strings.Contains(strings.ToLower(string(buff)), "keyboard") {
+			return fmt.Sprintf(resolved, i)
+		}
 	}
-
-	return ret, nil
+	return ""
 }
 
-func checkRoot() error {
-	if syscall.Getuid() != 0 && syscall.Geteuid() != 0 {
-		return fmt.Errorf("Cannot read device files. Are you running as root?")
-	}
-	return nil
+// IsRoot checks if the process is run with root permission
+func (k *KeyLogger) IsRoot() bool {
+	return syscall.Getuid() == 0 && syscall.Geteuid() == 0
 }
 
-func newInputDeviceReader(buff []byte, id int) *InputDevice {
-	rd := bufio.NewReader(bytes.NewReader(buff))
-	rd.ReadLine()
-	dev, _, _ := rd.ReadLine()
-	splt := strings.Split(string(dev), "=")
-
-	return &InputDevice{
-		Id:   id,
-		Name: splt[1],
-	}
-}
-
-func NewKeyLogger(dev *InputDevice) *KeyLogger {
-	return &KeyLogger{
-		dev: dev,
-	}
-}
-
-func (t *KeyLogger) Read() (chan InputEvent, error) {
-	ret := make(chan InputEvent, 512)
-
-	if err := checkRoot(); err != nil {
-		close(ret)
-		return ret, err
-	}
-
-	fd, err := os.Open(fmt.Sprintf(DEVICE_FILE, t.dev.Id))
-	if err != nil {
-		close(ret)
-		return ret, fmt.Errorf("Error opening device file:", err)
-	}
-
-	go func() {
-
-		tmp := make([]byte, eventsize)
-		event := InputEvent{}
+// Read from file descriptor
+// Blocking call, returns channel
+// Make sure to close channel when finish
+func (k *KeyLogger) Read() chan InputEvent {
+	event := make(chan InputEvent)
+	go func(event chan InputEvent) {
 		for {
-
-			n, err := fd.Read(tmp)
-			if err != nil {
-				panic(err)
-				close(ret)
-				break
+			e := k.read()
+			if e != nil {
+				event <- *e
 			}
-			if n <= 0 {
-				continue
-			}
-
-			if err := binary.Read(bytes.NewBuffer(tmp), binary.LittleEndian, &event); err != nil {
-				panic(err)
-			}
-
-			ret <- event
-
 		}
-	}()
-	return ret, nil
+	}(event)
+	return event
 }
 
-func (t *InputEvent) KeyString() string {
-	return keyCodeMap[t.Code]
+// read from file description and parse binary into go struct
+func (k *KeyLogger) read() *InputEvent {
+	buffer := make([]byte, eventsize)
+	n, err := k.fd.Read(buffer)
+	if err != nil {
+		logrus.Error(err)
+		return nil
+	}
+	if n <= 0 {
+		return nil
+	}
+	return k.eventFromBuffer(buffer)
+}
+
+// eventFromBuffer parser bytes into InputEvent struct
+func (k *KeyLogger) eventFromBuffer(buffer []byte) *InputEvent {
+	event := &InputEvent{}
+	err := binary.Read(bytes.NewBuffer(buffer), binary.LittleEndian, event)
+	if err != nil {
+		logrus.Error(err)
+		return nil
+	}
+	return event
+}
+
+// Close file descriptor
+func (k *KeyLogger) Close() error {
+	if k.fd == nil {
+		return nil
+	}
+	return k.fd.Close()
 }
