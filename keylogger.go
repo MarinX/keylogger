@@ -60,7 +60,13 @@ func (k *KeyLogger) Read() chan InputEvent {
 	event := make(chan InputEvent)
 	go func(event chan InputEvent) {
 		for {
-			e := k.read()
+			e, err := k.read()
+			if err != nil {
+				logrus.Error(err)
+				close(event)
+				break
+			}
+
 			if e != nil {
 				event <- *e
 			}
@@ -70,28 +76,24 @@ func (k *KeyLogger) Read() chan InputEvent {
 }
 
 // read from file description and parse binary into go struct
-func (k *KeyLogger) read() *InputEvent {
+func (k *KeyLogger) read() (*InputEvent, error) {
 	buffer := make([]byte, eventsize)
 	n, err := k.fd.Read(buffer)
 	if err != nil {
-		logrus.Error(err)
-		return nil
+		return nil, err
 	}
+	// no input, dont send error
 	if n <= 0 {
-		return nil
+		return nil, nil
 	}
 	return k.eventFromBuffer(buffer)
 }
 
 // eventFromBuffer parser bytes into InputEvent struct
-func (k *KeyLogger) eventFromBuffer(buffer []byte) *InputEvent {
+func (k *KeyLogger) eventFromBuffer(buffer []byte) (*InputEvent, error) {
 	event := &InputEvent{}
 	err := binary.Read(bytes.NewBuffer(buffer), binary.LittleEndian, event)
-	if err != nil {
-		logrus.Error(err)
-		return nil
-	}
-	return event
+	return event, err
 }
 
 // Close file descriptor

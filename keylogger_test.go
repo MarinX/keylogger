@@ -18,7 +18,11 @@ func TestBufferParser(t *testing.T) {
 	k := &KeyLogger{}
 
 	// keyboard
-	input := k.eventFromBuffer([]byte{138, 180, 84, 92, 0, 0, 0, 0, 62, 75, 8, 0, 0, 0, 0, 0, 4, 0, 4, 0, 30, 0, 0, 0})
+	input, err := k.eventFromBuffer([]byte{138, 180, 84, 92, 0, 0, 0, 0, 62, 75, 8, 0, 0, 0, 0, 0, 4, 0, 4, 0, 30, 0, 0, 0})
+	if err != nil {
+		t.Error(err)
+		return
+	}
 	if input == nil {
 		t.Error("Event is empty, expected parsed event")
 		return
