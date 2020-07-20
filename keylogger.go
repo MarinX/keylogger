@@ -56,6 +56,39 @@ func FindKeyboardDevice() string {
 	return ""
 }
 
+// Like FindKeyboardDevice, but finds all devices which contain keyword 'keyboard'
+// Returns an array of file paths which contain keyboard events
+func FindAllKeyboardDevices() []string {
+	path := "/sys/class/input/event%d/device/name"
+	resolved := "/dev/input/event%d"
+
+	valid := make([]string, 0)
+
+	for i := 0; i < 255; i++ {
+		buff, err := ioutil.ReadFile(fmt.Sprintf(path, i))
+
+		// prevent from checking non-existant files
+		if os.IsNotExist(err) {
+			break
+		}
+		if err != nil {
+			logrus.Error(err)
+		}
+
+		// check if mouse is contained in the input event
+		// if that is the case just skip.
+		// We do this check as it seems that some mouses like the logitech MX mouse is also recognized as a mouse/keyboard
+		if strings.Contains(strings.ToLower(string(buff)), "mouse") {
+			continue
+		}
+
+		if strings.Contains(strings.ToLower(string(buff)), "keyboard") {
+			valid = append(valid, fmt.Sprintf(resolved, i))
+		}
+	}
+	return valid
+}
+
 // IsRoot checks if the process is run with root permission
 func (k *KeyLogger) IsRoot() bool {
 	return syscall.Getuid() == 0 && syscall.Geteuid() == 0
