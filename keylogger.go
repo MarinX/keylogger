@@ -42,14 +42,16 @@ func FindKeyboardDevice() string {
 			logrus.Error(err)
 		}
 
+		stringifiedBuffer := string(buff)
+
 		// check if mouse is contained in the input event
 		// if that is the case just skip.
 		// We do this check as it seems that some mouses like the logitech MX mouse is also recognized as a mouse/keyboard
-		if strings.Contains(strings.ToLower(string(buff)), "mouse") {
+		if strings.Contains(strings.ToLower(stringifiedBuffer), "mouse") {
 			continue
 		}
 
-		if strings.Contains(strings.ToLower(string(buff)), "keyboard") {
+		if strings.Contains(strings.ToLower(stringifiedBuffer), "keyboard") || strings.Contains(stringifiedBuffer, "Logitech MX Keys") {
 			return fmt.Sprintf(resolved, i)
 		}
 	}
