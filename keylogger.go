@@ -18,6 +18,22 @@ type KeyLogger struct {
 	fd *os.File
 }
 
+type devices []string
+
+func (d* devices) hasDevice(str string) bool {
+	for _, device := range *d {
+		if strings.Contains(str, device) {
+			return true
+		}
+	}
+
+	return false
+}
+
+// use lowercase names for devices, as we turn the device input name to lower case
+var restrictedDevices = devices{"mouse"}
+var allowedDevices = devices{"keyboard", "logitech mx keys"}
+
 // New creates a new keylogger for a device path
 func New(devPath string) (*KeyLogger, error) {
 	k := &KeyLogger{}
@@ -42,17 +58,15 @@ func FindKeyboardDevice() string {
 			logrus.Error(err)
 		}
 
-		// check if mouse is contained in the input event
-		// if that is the case just skip.
-		// We do this check as it seems that some mouses like the logitech MX mouse is also recognized as a mouse/keyboard
-		if strings.Contains(strings.ToLower(string(buff)), "mouse") {
-			continue
-		}
+		deviceName := strings.ToLower(string(buff))
 
-		if strings.Contains(strings.ToLower(string(buff)), "keyboard") {
+		if restrictedDevices.hasDevice(deviceName) {
+			continue
+		} else if allowedDevices.hasDevice(deviceName) {
 			return fmt.Sprintf(resolved, i)
 		}
 	}
+
 	return ""
 }
 
@@ -75,14 +89,11 @@ func FindAllKeyboardDevices() []string {
 			logrus.Error(err)
 		}
 
-		// check if mouse is contained in the input event
-		// if that is the case just skip.
-		// We do this check as it seems that some mouses like the logitech MX mouse is also recognized as a mouse/keyboard
-		if strings.Contains(strings.ToLower(string(buff)), "mouse") {
-			continue
-		}
+		deviceName := strings.ToLower(string(buff))
 
-		if strings.Contains(strings.ToLower(string(buff)), "keyboard") {
+		if restrictedDevices.hasDevice(deviceName) {
+			continue
+		} else if allowedDevices.hasDevice(deviceName) {
 			valid = append(valid, fmt.Sprintf(resolved, i))
 		}
 	}
