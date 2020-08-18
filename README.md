@@ -74,8 +74,3 @@ go test -v
 
 ## License
 This library is under the MIT License
-
-## Donate
-I don't drink beer, so energy drink will do :)
-
-BTC: 19AtHE6dgKX3R9vJSCSKRyF1saexLcBRep 
