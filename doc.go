@@ -10,5 +10,7 @@
 //
 // * Capture state changes
 //
+// * Write back to keyboard
+//
 // See README at https://github.com/MarinX/keylogger for more info.
 package keylogger
