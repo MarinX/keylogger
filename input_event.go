@@ -63,3 +63,11 @@ func (i *InputEvent) KeyPress() bool {
 func (i *InputEvent) KeyRelease() bool {
 	return i.Value == 0
 }
+
+// KeyEvent is the keyboard event for up/down (press/release)
+type KeyEvent int32
+
+const (
+	KeyPress   KeyEvent = 1
+	KeyRelease KeyEvent = 0
+)

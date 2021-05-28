@@ -1,6 +1,8 @@
 package main
 
 import (
+	"time"
+
 	"github.com/MarinX/keylogger"
 	"github.com/sirupsen/logrus"
 )
@@ -24,6 +26,17 @@ func main() {
 		return
 	}
 	defer k.Close()
+
+	// write to keyboard example:
+	go func() {
+		time.Sleep(5 * time.Second)
+		// open text editor and focus on it, it should say "marin" and new line will be printed
+		keys := []string{"m", "a", "r", "i", "n", "ENTER"}
+		for _, key := range keys {
+			// write once will simulate keyboard press/release, for long press or release, lookup at Write
+			k.WriteOnce(key)
+		}
+	}()
 
 	events := k.Read()
 

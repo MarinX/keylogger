@@ -9,8 +9,6 @@ import (
 	"os"
 	"strings"
 	"syscall"
-
-	"github.com/sirupsen/logrus"
 )
 
 // KeyLogger wrapper around file descriptior
@@ -20,7 +18,7 @@ type KeyLogger struct {
 
 type devices []string
 
-func (d* devices) hasDevice(str string) bool {
+func (d *devices) hasDevice(str string) bool {
 	for _, device := range *d {
 		if strings.Contains(str, device) {
 			return true
@@ -40,7 +38,7 @@ func New(devPath string) (*KeyLogger, error) {
 	if !k.IsRoot() {
 		return nil, errors.New("Must be run as root")
 	}
-	fd, err := os.Open(devPath)
+	fd, err := os.OpenFile(devPath, os.O_RDWR, os.ModeCharDevice)
 	k.fd = fd
 	return k, err
 }
@@ -55,7 +53,7 @@ func FindKeyboardDevice() string {
 	for i := 0; i < 255; i++ {
 		buff, err := ioutil.ReadFile(fmt.Sprintf(path, i))
 		if err != nil {
-			logrus.Error(err)
+			continue
 		}
 
 		deviceName := strings.ToLower(string(buff))
@@ -86,7 +84,7 @@ func FindAllKeyboardDevices() []string {
 			break
 		}
 		if err != nil {
-			logrus.Error(err)
+			continue
 		}
 
 		deviceName := strings.ToLower(string(buff))
@@ -114,7 +112,6 @@ func (k *KeyLogger) Read() chan InputEvent {
 		for {
 			e, err := k.read()
 			if err != nil {
-				logrus.Error(err)
 				close(event)
 				break
 			}
@@ -125,6 +122,59 @@ func (k *KeyLogger) Read() chan InputEvent {
 		}
 	}(event)
 	return event
+}
+
+// Write writes to keyboard and sync the event
+// This will keep the key pressed or released until you call another write with other direction
+// eg, if the key is "A" and direction is press, on UI, you will see "AAAAA..." until you stop with release
+// Probably you want to use WriteOnce method
+func (k *KeyLogger) Write(direction KeyEvent, key string) error {
+	key = strings.ToUpper(key)
+	code := uint16(0)
+	for c, k := range keyCodeMap {
+		if k == key {
+			code = c
+		}
+	}
+	if code == 0 {
+		return fmt.Errorf("%s key not found in key code map", key)
+	}
+	err := k.write(InputEvent{
+		Type:  EvKey,
+		Code:  code,
+		Value: int32(direction),
+	})
+	if err != nil {
+		return err
+	}
+	return k.syn()
+}
+
+// WriteOnce method simulates single key press
+// When you send a key, it will press it, release it and send to sync
+func (k *KeyLogger) WriteOnce(key string) error {
+	key = strings.ToUpper(key)
+	code := uint16(0)
+	for c, k := range keyCodeMap {
+		if k == key {
+			code = c
+		}
+	}
+	if code == 0 {
+		return fmt.Errorf("%s key not found in key code map", key)
+	}
+
+	for _, i := range []int32{int32(KeyPress), int32(KeyRelease)} {
+		err := k.write(InputEvent{
+			Type:  EvKey,
+			Code:  code,
+			Value: i,
+		})
+		if err != nil {
+			return err
+		}
+	}
+	return k.syn()
 }
 
 // read from file description and parse binary into go struct
@@ -139,6 +189,20 @@ func (k *KeyLogger) read() (*InputEvent, error) {
 		return nil, nil
 	}
 	return k.eventFromBuffer(buffer)
+}
+
+// write to keyboard
+func (k *KeyLogger) write(ev InputEvent) error {
+	return binary.Write(k.fd, binary.LittleEndian, ev)
+}
+
+// syn syncs input events
+func (k *KeyLogger) syn() error {
+	return binary.Write(k.fd, binary.LittleEndian, InputEvent{
+		Type:  EvSyn,
+		Code:  0,
+		Value: 0,
+	})
 }
 
 // eventFromBuffer parser bytes into InputEvent struct

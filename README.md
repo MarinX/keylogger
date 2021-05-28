@@ -46,6 +46,25 @@ Once you get desire event, there is a helper to parse code into human readable k
 ```go
 event.KeyString()
 ```
+
+### Writing keypress
+Best way is to open an text editor and see how keyboard will react
+There are 2 methods:
+```go
+func (k *KeyLogger) WriteOnce(key string) error
+```
+and
+```go
+func (k *KeyLogger) Write(direction KeyEvent, key string) error 
+```
+`WriteOnce` method simulates single key press, eg: press and release letter M
+
+`Write` writes to keyboard and sync the event. 
+This will keep the key pressed or released until you call another write with other direction
+eg, if the key is "A" and direction is press, on UI, you will see "AAAAA..." until you stop with release
+
+Probably you want to use `WriteOnce` method
+
 **NOTE**
 
 If you listen on keyboard state change, it will return __double__ results.
