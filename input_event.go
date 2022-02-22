@@ -54,11 +54,6 @@ func (i *InputEvent) KeyString() string {
 	return keyCodeMap[i.Code]
 }
 
-//Temporary function to map key modifiers so we can return the correct keypresses
-func (i *InputEvent) EventValue() int32 {
-	return i.Value
-}
-
 // KeyPress is the value when we press the key on keyboard
 func (i *InputEvent) KeyPress() bool {
 	return i.Value == 1

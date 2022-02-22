@@ -117,6 +117,7 @@ func (k *KeyLogger) Read() chan InputEvent {
 			}
 
 			if e != nil {
+				fmt.Println(e)
 				event <- *e
 			}
 		}
