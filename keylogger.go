@@ -121,19 +121,21 @@ func (k *KeyLogger) Read() chan InputEvent {
 				//fmt.Println("type:", e.Type, "code:", e.Code, "value:", e.Value, "character:", keyCodeMap[e.Code])
 				if (e.Code == 42 && e.Value == 1) || (e.Code == 54 && e.Value == 1) {
 					fmt.Println("CODE")
-					for e.Value != 1 {
-						f, err := k.read()
-						fmt.Println("HERE1")
-						if err != nil {
-							fmt.Println("ERROR:", err)
-							close(event)
-							break
-						}
-						if f != nil && f.Value == 0 {
-							fmt.Println("HERE2")
-							e.Code = f.Code + 200
-							break
-						}
+					for {
+						f, _ := k.read()
+						fmt.Println("F:   type:", f.Type, "code:", f.Code, "value:", f.Value, "character:", keyCodeMap[f.Code])
+						fmt.Println("e:", e.Code, "f:", f.Code)
+						// fmt.Println("HERE1")
+						// if err != nil {
+						// 	fmt.Println("ERROR:", err)
+						// 	close(event)
+						// 	break
+						// }
+						// if f != nil && f.Value == 0 {
+						// 	fmt.Println("HERE2")
+						// 	e.Code = f.Code + 200
+						// 	break
+						// }
 					}
 				}
 				fmt.Println("type:", e.Type, "code:", e.Code, "value:", e.Value, "character:", keyCodeMap[e.Code])
