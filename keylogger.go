@@ -120,7 +120,16 @@ func (k *KeyLogger) Read() chan InputEvent {
 				// e is outputted like this &{{1645515059 931780} 0 30 1} where 30 is the character code from the keymap and 1 is the status 1 for down 0 for up
 				//fmt.Println("type:", e.Type, "code:", e.Code, "value:", e.Value, "character:", keyCodeMap[e.Code])
 				if (e.Code == 42 && e.Value == 1) || (e.Code == 54 && e.Value == 1) {
-					e.Code = e.Code + 200
+					for e.Value != 0 {
+						f, err := k.read()
+						if err != nil {
+							close(event)
+							break
+						}
+						if f != nil && f.Value == 1 {
+							e.Code = f.Code + 200
+						}
+					}
 				}
 				fmt.Println("type:", e.Type, "code:", e.Code, "value:", e.Value, "character:", keyCodeMap[e.Code])
 				event <- *e
