@@ -117,7 +117,7 @@ func (k *KeyLogger) Read() chan InputEvent {
 			}
 
 			if e != nil {
-				fmt.Println(e)
+				fmt.Println("e:", e)
 				event <- *e
 			}
 		}
@@ -212,6 +212,8 @@ func (k *KeyLogger) syn() error {
 func (k *KeyLogger) eventFromBuffer(buffer []byte) (*InputEvent, error) {
 	event := &InputEvent{}
 	err := binary.Read(bytes.NewBuffer(buffer), binary.LittleEndian, event)
+	str1 := bytes.NewBuffer(buffer).String()
+	fmt.Println(str1)
 	return event, err
 }
 
