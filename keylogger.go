@@ -189,7 +189,7 @@ func (k *KeyLogger) read() (*InputEvent, error) {
 	if n <= 0 {
 		return nil, nil
 	}
-	fmt.Println(buffer)
+	fmt.Println(string(buffer), buffer)
 	return k.eventFromBuffer(buffer)
 }
 
