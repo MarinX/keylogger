@@ -137,6 +137,7 @@ func (k *KeyLogger) Read() chan InputEvent {
 					}
 				}
 				fmt.Println("type:", e.Type, "code:", e.Code, "value:", e.Value, "character:", keyCodeMap[e.Code])
+				//@todo event will need to become a map so we can return the shift key presses and also return the actual key we pressed with shift
 				event <- *e
 			}
 		}
