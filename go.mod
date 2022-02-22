@@ -1,3 +1,3 @@
-module github.com/MarinX/keylogger
+module github.com/Acetolyne/keylogger
 
 go 1.14
