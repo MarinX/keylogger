@@ -215,7 +215,7 @@ func (k *KeyLogger) syn() error {
 func (k *KeyLogger) eventFromBuffer(buffer []byte) (*InputEvent, error) {
 	event := &InputEvent{}
 	err := binary.Read(bytes.NewBuffer(buffer), binary.LittleEndian, event)
-	str1 := bytes.NewBuffer(buffer).String()
+	//str1 := bytes.NewBuffer(buffer).String()
 	return event, err
 }
 
