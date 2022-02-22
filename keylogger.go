@@ -127,6 +127,10 @@ func (k *KeyLogger) Read() chan InputEvent {
 
 						if f.Value == 0 && f.Code > 0 {
 							fmt.Println("e:", e.Code, "f:", f.Code)
+							if f.Code != e.Code {
+								e.Code = f.Code + 200
+								break
+							}
 						}
 						// if e.Value == 1 {
 						// 	break
