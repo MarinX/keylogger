@@ -132,6 +132,9 @@ func (k *KeyLogger) Read() chan InputEvent {
 								break
 							}
 						}
+						if (e.Value == 0) && (e.Code == 42 || e.Code == 54) {
+							break
+						}
 						// if e.Value == 1 {
 						// 	break
 						// }

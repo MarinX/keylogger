@@ -121,4 +121,5 @@ var keyCodeMap = map[uint16]string{
 	117: "",
 	118: "",
 	119: "Pause",
+	230: "A",
 }
