@@ -125,6 +125,9 @@ func (k *KeyLogger) Read() chan InputEvent {
 						f, _ := k.read()
 						fmt.Println("F:   type:", f.Type, "code:", f.Code, "value:", f.Value, "character:", keyCodeMap[f.Code])
 						fmt.Println("e:", e.Code, "f:", f.Code)
+						if e.Value == 1 {
+							break
+						}
 						// fmt.Println("HERE1")
 						// if err != nil {
 						// 	fmt.Println("ERROR:", err)
