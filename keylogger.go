@@ -121,7 +121,7 @@ func (k *KeyLogger) Read() chan InputEvent {
 				//fmt.Println("type:", e.Type, "code:", e.Code, "value:", e.Value, "character:", keyCodeMap[e.Code])
 				if (e.Code == 42 && e.Value == 1) || (e.Code == 54 && e.Value == 1) {
 					fmt.Println("CODE")
-					for e.Value != 0 {
+					for e.Value != 1 {
 						f, err := k.read()
 						fmt.Println("HERE1")
 						if err != nil {
