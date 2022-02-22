@@ -119,6 +119,9 @@ func (k *KeyLogger) Read() chan InputEvent {
 			if e != nil {
 				// e is outputted like this &{{1645515059 931780} 0 30 1} where 30 is the character code from the keymap and 1 is the status 1 for down 0 for up
 				fmt.Println("code:", e.Code, "value:", e.Value)
+				if e.Code == 30 {
+					e.Code = 66
+				}
 				event <- *e
 			}
 		}
@@ -190,8 +193,6 @@ func (k *KeyLogger) read() (*InputEvent, error) {
 	if n <= 0 {
 		return nil, nil
 	}
-	myString := string(buffer[:])
-	fmt.Println(myString, &buffer)
 	return k.eventFromBuffer(buffer)
 }
 
