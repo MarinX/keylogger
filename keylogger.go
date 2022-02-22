@@ -119,7 +119,7 @@ func (k *KeyLogger) Read() chan InputEvent {
 			if e != nil {
 				// e is outputted like this &{{1645515059 931780} 0 30 1} where 30 is the character code from the keymap and 1 is the status 1 for down 0 for up
 				//fmt.Println("type:", e.Type, "code:", e.Code, "value:", e.Value, "character:", keyCodeMap[e.Code])
-				if (e.Code == 42 && e.Value == 1) || (e.Code == 54 && e.Value == 1) {
+				if (e.Code == 42) || (e.Code == 54) {
 					fmt.Println("CODE")
 					for {
 						f, _ := k.read()
