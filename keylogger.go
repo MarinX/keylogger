@@ -129,7 +129,7 @@ func (k *KeyLogger) Read() chan InputEvent {
 							close(event)
 							break
 						}
-						if f != nil && f.Value == 1 {
+						if f != nil && f.Value == 0 {
 							fmt.Println("HERE2")
 							e.Code = f.Code + 200
 							break
