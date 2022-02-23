@@ -2,9 +2,8 @@
 
 Capture global keyboard events on Linux
 
-[![Build Status](https://travis-ci.org/MarinX/keylogger.svg?branch=master)](https://travis-ci.org/MarinX/keylogger)
-[![GoDoc](https://godoc.org/github.com/MarinX/keylogger?status.svg)](https://godoc.org/github.com/MarinX/keylogger)
-[![License MIT](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat)](LICENSE)
+Forked from github.com/MarinX/keylogger
+Modified to return correct case of character and other characters accessed by holding down modifier keys such as SHIFT
 
 ## Notes
 * Only Linux based
@@ -12,7 +11,7 @@ Capture global keyboard events on Linux
 
 ## Installation
 ```sh
-go get github.com/MarinX/keylogger
+go get github.com/Acetolyne/keylogger
 ```
 
 ## Getting started
@@ -37,7 +36,7 @@ keylogger.New("/dev/input/event2")
 ```
 
 ### Getting keypress
-Once the keylogger returns channel event, you can switch by event code as described in [input_event.go](https://github.com/MarinX/keylogger/blob/master/input_event.go)
+Once the keylogger returns channel event, you can switch by event code as described in [input_event.go](https://github.com/Acetolyne/keylogger/blob/master/input_event.go)
 For start, you can listen on keyboard state change 
 ```go
 keylogger.EvKey
@@ -86,9 +85,6 @@ No magic, just run
 ```sh
 go test -v
 ```
-
-## Creating key sniffer (needs update)
-* [sniffing global keyboard events in go](https://medium.com/@marin.basic02/sniffing-global-keyboard-events-in-go-e5497e618192/)
 
 
 ## License
