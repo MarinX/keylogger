@@ -106,9 +106,10 @@ func (k *KeyLogger) IsRoot() bool {
 // Read from file descriptor
 // Blocking call, returns channel
 // Make sure to close channel when finish
-func (k *KeyLogger) Read() chan InputEvent {
-	event := make(chan InputEvent)
-	go func(event chan InputEvent) {
+func (k *KeyLogger) Read() chan map[int]InputEvent {
+	event := make(chan map[int]InputEvent)
+	events := make(map[int]InputEvent)
+	go func(event chan map[int]InputEvent) {
 		for {
 			e, err := k.read()
 			if err != nil {
@@ -134,6 +135,9 @@ func (k *KeyLogger) Read() chan InputEvent {
 							if f.Value == 0 && f.Code > 0 {
 								fmt.Println("e:", e.Code, "f:", f.Code)
 								if f.Code != e.Code {
+									curlen := len(events)
+									events[curlen+1] = *e
+									events[curlen+2] = *f
 									e.Code = f.Code + 200
 									break
 								}
@@ -146,7 +150,8 @@ func (k *KeyLogger) Read() chan InputEvent {
 				}
 				fmt.Println("type:", e.Type, "code:", e.Code, "value:", e.Value, "character:", keyCodeMap[e.Code])
 				//@todo event will need to become a map so we can return the shift key presses and also return the actual key we pressed with shift
-				event <- *e
+
+				event <- events
 			}
 		}
 	}(event)

@@ -48,6 +48,11 @@ type InputEvent struct {
 	Value int32
 }
 
+//InputEvents is a map of InputEvent objects that may be returned all at once by Read()
+type InputEvents struct {
+	Events []InputEvent
+}
+
 // KeyString returns representation of pressed key as string
 // eg enter, space, a, b, c...
 func (i *InputEvent) KeyString() string {
