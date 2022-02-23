@@ -122,9 +122,8 @@ func (k *KeyLogger) Read() chan InputEvent {
 				//fmt.Println("type:", e.Type, "code:", e.Code, "value:", e.Value, "character:", keyCodeMap[e.Code])
 				if (e.Code == 42) || (e.Code == 54) {
 					modifier := e.Code
-					if e.Value == 1 {
-						for {
-
+					for {
+						if e.Value == 1 {
 							f, _ := k.read()
 							if f.Code == modifier {
 								fmt.Println("breaking")
