@@ -122,7 +122,12 @@ func (k *KeyLogger) Read() chan InputEvent {
 				if (e.Code == 42) || (e.Code == 54) {
 					modifier := e.Code
 					for {
+
 						f, _ := k.read()
+						if f.Code == modifier {
+							fmt.Println("breaking")
+							break
+						}
 						//fmt.Println("F:   type:", f.Type, "code:", f.Code, "value:", f.Value, "character:", keyCodeMap[f.Code])
 
 						if f.Value == 0 && f.Code > 0 {
@@ -134,10 +139,7 @@ func (k *KeyLogger) Read() chan InputEvent {
 						}
 						fmt.Println("E:   type:", e.Type, "code:", e.Code, "value:", e.Value, "character:", keyCodeMap[e.Code])
 						//when we are releasing the modifier key break incase we pressed it and released it without pressing anything else
-						if f.Code == modifier {
-							fmt.Println("breaking")
-							break
-						}
+
 					}
 				}
 				fmt.Println("type:", e.Type, "code:", e.Code, "value:", e.Value, "character:", keyCodeMap[e.Code])
