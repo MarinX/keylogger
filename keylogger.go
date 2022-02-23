@@ -138,20 +138,6 @@ func (k *KeyLogger) Read() chan InputEvent {
 							fmt.Println("breaking")
 							break
 						}
-						// if e.Value == 1 {
-						// 	break
-						// }
-						// fmt.Println("HERE1")
-						// if err != nil {
-						// 	fmt.Println("ERROR:", err)
-						// 	close(event)
-						// 	break
-						// }
-						// if f != nil && f.Value == 0 {
-						// 	fmt.Println("HERE2")
-						// 	e.Code = f.Code + 200
-						// 	break
-						// }
 					}
 				}
 				fmt.Println("type:", e.Type, "code:", e.Code, "value:", e.Value, "character:", keyCodeMap[e.Code])
