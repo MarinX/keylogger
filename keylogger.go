@@ -112,6 +112,7 @@ func (k *KeyLogger) Read() chan InputEvent {
 		for {
 			e, err := k.read()
 			if err != nil {
+				fmt.Println("closing time")
 				close(event)
 				break
 			}
@@ -134,19 +135,17 @@ func (k *KeyLogger) Read() chan InputEvent {
 							if f.Value == 0 && f.Code > 0 {
 								fmt.Println("e:", e.Code, "f:", f.Code)
 								if f.Code != e.Code {
-									e.Code = f.Code + 200
+									f.Code = f.Code + 200
 									event <- *f
 									break
 								}
 							}
 							fmt.Println("E:   type:", e.Type, "code:", e.Code, "value:", e.Value, "character:", keyCodeMap[e.Code])
-							//when we are releasing the modifier key break incase we pressed it and released it without pressing anything else
 
 						}
 					}
 				}
 				fmt.Println("type:", e.Type, "code:", e.Code, "value:", e.Value, "character:", keyCodeMap[e.Code])
-				//@todo event will need to become a map so we can return the shift key presses and also return the actual key we pressed with shift
 
 				event <- *e
 			}
