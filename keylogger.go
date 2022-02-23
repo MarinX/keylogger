@@ -133,7 +133,8 @@ func (k *KeyLogger) Read() chan InputEvent {
 							}
 						}
 						fmt.Println("E:   type:", e.Type, "code:", e.Code, "value:", e.Value, "character:", keyCodeMap[e.Code])
-						if (e.Value == 0) && (e.Code == modifier) {
+						//when we are releasing the modifier key break incase we pressed it and released it without pressing anything else
+						if f.Code == modifier {
 							fmt.Println("breaking")
 							break
 						}
