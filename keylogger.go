@@ -120,7 +120,7 @@ func (k *KeyLogger) Read() chan InputEvent {
 				// e is outputted like this &{{1645515059 931780} 0 30 1} where 30 is the character code from the keymap and 1 is the status 1 for down 0 for up
 				//fmt.Println("type:", e.Type, "code:", e.Code, "value:", e.Value, "character:", keyCodeMap[e.Code])
 				if (e.Code == 42) || (e.Code == 54) {
-					fmt.Println("CODE")
+					modifier := e.Code
 					for {
 						f, _ := k.read()
 						//fmt.Println("F:   type:", f.Type, "code:", f.Code, "value:", f.Value, "character:", keyCodeMap[f.Code])
@@ -133,7 +133,7 @@ func (k *KeyLogger) Read() chan InputEvent {
 							}
 						}
 						fmt.Println("E:   type:", e.Type, "code:", e.Code, "value:", e.Value, "character:", keyCodeMap[e.Code])
-						if (e.Value == 0) && (e.Code == 42 || e.Code == 54) {
+						if (e.Value == 0) && (e.Code == modifier) {
 							fmt.Println("breaking")
 							break
 						}
