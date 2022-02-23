@@ -36,7 +36,7 @@ var allowedDevices = devices{"keyboard", "logitech mx keys"}
 func New(devPath string) (*KeyLogger, error) {
 	k := &KeyLogger{}
 	if !k.IsRoot() {
-		return nil, errors.New("Must be run as root")
+		return nil, errors.New("must be run as root")
 	}
 	fd, err := os.OpenFile(devPath, os.O_RDWR, os.ModeCharDevice)
 	k.fd = fd
@@ -106,10 +106,9 @@ func (k *KeyLogger) IsRoot() bool {
 // Read from file descriptor
 // Blocking call, returns channel
 // Make sure to close channel when finish
-func (k *KeyLogger) Read() chan map[int]InputEvent {
-	event := make(chan map[int]InputEvent)
-	events := make(map[int]InputEvent)
-	go func(event chan map[int]InputEvent) {
+func (k *KeyLogger) Read() chan InputEvent {
+	event := make(chan InputEvent)
+	go func(event chan InputEvent) {
 		for {
 			e, err := k.read()
 			if err != nil {
@@ -135,10 +134,8 @@ func (k *KeyLogger) Read() chan map[int]InputEvent {
 							if f.Value == 0 && f.Code > 0 {
 								fmt.Println("e:", e.Code, "f:", f.Code)
 								if f.Code != e.Code {
-									curlen := len(events)
-									events[curlen+1] = *e
-									events[curlen+2] = *f
 									e.Code = f.Code + 200
+									event <- *f
 									break
 								}
 							}
@@ -151,7 +148,7 @@ func (k *KeyLogger) Read() chan map[int]InputEvent {
 				fmt.Println("type:", e.Type, "code:", e.Code, "value:", e.Value, "character:", keyCodeMap[e.Code])
 				//@todo event will need to become a map so we can return the shift key presses and also return the actual key we pressed with shift
 
-				event <- events
+				event <- *e
 			}
 		}
 	}(event)
