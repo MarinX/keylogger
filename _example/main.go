@@ -1,11 +1,13 @@
 package main
 
 import (
+	"fmt"
 	"time"
 
-	"github.com/MarinX/keylogger"
-	"github.com/sirupsen/logrus"
+	"github.com/Acetolyne/keylogger"
 )
+
+//@todo update this file to give better examples, these examples came from the forked repository
 
 func main() {
 
@@ -14,15 +16,15 @@ func main() {
 
 	// check if we found a path to keyboard
 	if len(keyboard) <= 0 {
-		logrus.Error("No keyboard found...you will need to provide manual input path")
+		fmt.Println("No keyboard found...you will need to provide manual input path")
 		return
 	}
 
-	logrus.Println("Found a keyboard at", keyboard)
+	fmt.Println("Found a keyboard at", keyboard)
 	// init keylogger with keyboard
 	k, err := keylogger.New(keyboard)
 	if err != nil {
-		logrus.Error(err)
+		fmt.Println(err)
 		return
 	}
 	defer k.Close()
@@ -49,15 +51,13 @@ func main() {
 
 			// if the state of key is pressed
 			if e.KeyPress() {
-				logrus.Println("[event] press key ", e.KeyString())
+				fmt.Println("[event] press key ", e.KeyString())
 			}
 
 			// if the state of key is released
 			if e.KeyRelease() {
-				logrus.Println("[event] release key ", e.KeyString())
+				fmt.Println("[event] release key ", e.KeyString())
 			}
-
-			break
 		}
 	}
 }

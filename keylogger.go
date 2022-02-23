@@ -11,6 +11,9 @@ import (
 	"syscall"
 )
 
+//@todo create test files
+//@todo add test to github merge check
+
 // KeyLogger wrapper around file descriptior
 type KeyLogger struct {
 	fd *os.File
