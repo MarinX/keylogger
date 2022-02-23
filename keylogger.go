@@ -121,25 +121,27 @@ func (k *KeyLogger) Read() chan InputEvent {
 				//fmt.Println("type:", e.Type, "code:", e.Code, "value:", e.Value, "character:", keyCodeMap[e.Code])
 				if (e.Code == 42) || (e.Code == 54) {
 					modifier := e.Code
-					for {
+					if e.Value == 1 {
+						for {
 
-						f, _ := k.read()
-						if f.Code == modifier {
-							fmt.Println("breaking")
-							break
-						}
-						//fmt.Println("F:   type:", f.Type, "code:", f.Code, "value:", f.Value, "character:", keyCodeMap[f.Code])
-
-						if f.Value == 0 && f.Code > 0 {
-							fmt.Println("e:", e.Code, "f:", f.Code)
-							if f.Code != e.Code {
-								e.Code = f.Code + 200
+							f, _ := k.read()
+							if f.Code == modifier {
+								fmt.Println("breaking")
 								break
 							}
-						}
-						fmt.Println("E:   type:", e.Type, "code:", e.Code, "value:", e.Value, "character:", keyCodeMap[e.Code])
-						//when we are releasing the modifier key break incase we pressed it and released it without pressing anything else
+							//fmt.Println("F:   type:", f.Type, "code:", f.Code, "value:", f.Value, "character:", keyCodeMap[f.Code])
 
+							if f.Value == 0 && f.Code > 0 {
+								fmt.Println("e:", e.Code, "f:", f.Code)
+								if f.Code != e.Code {
+									e.Code = f.Code + 200
+									break
+								}
+							}
+							fmt.Println("E:   type:", e.Type, "code:", e.Code, "value:", e.Value, "character:", keyCodeMap[e.Code])
+							//when we are releasing the modifier key break incase we pressed it and released it without pressing anything else
+
+						}
 					}
 				}
 				fmt.Println("type:", e.Type, "code:", e.Code, "value:", e.Value, "character:", keyCodeMap[e.Code])
