@@ -35,12 +35,15 @@ var allowedDevices = devices{"keyboard", "logitech mx keys"}
 // New creates a new keylogger for a device path
 func New(devPath string) (*KeyLogger, error) {
 	k := &KeyLogger{}
-	if !k.IsRoot() {
-		return nil, errors.New("Must be run as root")
-	}
 	fd, err := os.OpenFile(devPath, os.O_RDWR, os.ModeCharDevice)
+	if err != nil {
+		if os.IsPermission(err) && !k.IsRoot() {
+			return nil, errors.New("permission denied. run with root permission or use a user with access to " + devPath)
+		}
+		return nil, err
+	}
 	k.fd = fd
-	return k, err
+	return k, nil
 }
 
 // FindKeyboardDevice by going through each device registered on OS

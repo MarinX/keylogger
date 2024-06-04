@@ -1,6 +1,7 @@
 package keylogger
 
 import (
+	"os"
 	"testing"
 )
 
@@ -36,5 +37,28 @@ func TestBufferParser(t *testing.T) {
 	if input.Type != EvMsc {
 		t.Errorf("wrong event type. expected key press but got %v", input.Type)
 		return
+	}
+}
+
+func TestWithPermission(t *testing.T) {
+	fd, err := os.CreateTemp("", "*")
+	if err != nil {
+		t.Fatal(err)
+	}
+	// try to create new keylogger with file descriptor which has the permission
+	k, err := New(fd.Name())
+	if err != nil {
+		t.Fatal(err)
+	}
+	k.Close()
+	fd.Close()
+
+	// try to create new keylogger with file descriptor which has no permission
+	_, err = New("/dev/tty0")
+	if err == nil {
+		t.Fatal("expected error, got nil")
+	}
+	if err.Error() != "permission denied. run with root permission or use a user with access to /dev/tty0" {
+		t.Fatalf("unexpected error: %v", err)
 	}
 }
