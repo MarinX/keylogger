@@ -222,3 +222,55 @@ func (k *KeyLogger) Close() error {
 	}
 	return k.fd.Close()
 }
+
+func FindKeyboardDeviceByName(name string) string {
+	path := "/sys/class/input/event%d/device/name"
+	resolved := "/dev/input/event%d"
+
+	target := strings.ToLower(name)
+
+	for i := 0; i < 255; i++ {
+		buff, err := ioutil.ReadFile(fmt.Sprintf(path, i))
+		if os.IsNotExist(err) {
+			break
+		}
+		if err != nil {
+			continue
+		}
+
+		deviceName := strings.ToLower(strings.TrimSpace(string(buff)))
+
+		if strings.Contains(deviceName, target) {
+			return fmt.Sprintf(resolved, i)
+		}
+	}
+
+	return ""
+}
+
+// FindAllKeyboardDevicesByName is like FindKeyboardDeviceByName but returns
+// every matching device path instead of just the first one.
+func FindAllKeyboardDevicesByName(name string) []string {
+	path := "/sys/class/input/event%d/device/name"
+	resolved := "/dev/input/event%d"
+
+	target := strings.ToLower(name)
+	valid := make([]string, 0)
+
+	for i := 0; i < 255; i++ {
+		buff, err := ioutil.ReadFile(fmt.Sprintf(path, i))
+		if os.IsNotExist(err) {
+			break
+		}
+		if err != nil {
+			continue
+		}
+
+		deviceName := strings.ToLower(strings.TrimSpace(string(buff)))
+
+		if strings.Contains(deviceName, target) {
+			valid = append(valid, fmt.Sprintf(resolved, i))
+		}
+	}
+	return valid
+}
